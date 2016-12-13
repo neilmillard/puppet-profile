@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>this uses terraform create a blank apache webserver ready to be configured on its default URL</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>7</daysToKeep>
+        <numToKeep>30</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>SVR_DIR</name>
+          <description>the directory in the https://github.com/neilmillard/terraform-drupal repo that contains the desired terraform files</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>webapp</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>PLAN</name>
+          <description>Choice to run terraform plan or terraform apply</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>plan</string>
+              <string>apply</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.0.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/neilmillard/terraform-drupal</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions>
+      <hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
+        <relativeTargetDir>terraform-drupal</relativeTargetDir>
+      </hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
+    </extensions>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+# Check we got a working folder
+cd $WORKSPACE/terraform-drupal/$SVR_DIR
+if [[ $? != 0 ]]
+  echo &quot;Clone or cd to config folder failed!&quot;
+  exit 1
+fi
+# setup AWS credentials 
+cat &lt;&lt; EOF &gt; $WORKSPACE/terraform-drupal/$SVR_DIR/terraform.tfvars
+access_key = &quot;$AWS_ACCESS_KEY&quot;
+secret_key = &quot;$AWS_SECRET_KEY&quot;
+region     = &quot;us-east-1&quot;
+EOF
+
+# default is to run plan, unless apply is specific ! there is a jenkins plugin for this that
+# provides more functionality
+if [[ $PLAN != &quot;APPLY&quot; ]]
+  /usr/local/bin/terraform apply
+else
+  /usr/local/bin/terraform plan
+fi
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper plugin="credentials-binding@1.10">
+      <bindings>
+        <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+          <credentialsId>AWS_ACCESS_KEY</credentialsId>
+          <variable>AWS_ACCESS_KEY</variable>
+        </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+        <org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+          <credentialsId>AWS_SECRET_KEY</credentialsId>
+          <variable>AWS_SECRET_KEY</variable>
+        </org.jenkinsci.plugins.credentialsbinding.impl.StringBinding>
+      </bindings>
+    </org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper>
+  </buildWrappers>
+</project>
