@@ -25,14 +25,4 @@ class profile::apache (
     template            => 'apache/virtualhost/vhost.conf.erb',
   }
 
-  apache::vhost { 'blog.mitese.co.uk':
-    docroot                    => '/var/www/sites/mts/public',
-    directories                => [
-      { path => '/var/www/sites/mts',
-        allow_override => ['All'] }
-    ],
-    directory_allow_override   => 'All',
-    access_log_format          => 'forwarded',
-  }
-
 }
