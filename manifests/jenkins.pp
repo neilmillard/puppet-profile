@@ -1,7 +1,7 @@
 class profile::jenkins () {
   include jenkins
 
-  jenkins::job { 'build%20webserver':
+  jenkins::job { 'build.webserver':
     config => template("${module_name}/jenkins/build_webserver.xml.erb")
   }
   # jenkins::job { 'test-build-job':
