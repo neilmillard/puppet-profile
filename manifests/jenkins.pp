@@ -1,6 +1,6 @@
 class profile::jenkins () {
   include jenkins
-  jenkins::plugin { 'Git Plugin':
+  jenkins::plugin { 'git':
     version => '3.0.1'
   }
   # jenkins::job { 'test-build-job':
