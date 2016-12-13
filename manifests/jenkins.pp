@@ -25,7 +25,7 @@ class profile::jenkins () {
     version => '1.7.1'
   }
   jenkins::plugin { 'junit':
-    version => '1.2'
+    version => '1.3'
   }
   jenkins::plugin { 'script-security':
     version => '1.13'
