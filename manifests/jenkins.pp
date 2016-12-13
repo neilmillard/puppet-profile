@@ -7,10 +7,10 @@ class profile::jenkins () {
     version => '1.5'
   }
   jenkins::plugin { 'workflow-scm-step':
-    version => '1.14.2'
+    version => '2.3'
   }
   jenkins::plugin { 'workflow-step-api':
-    version => '1.14.2'
+    version => '2.6'
   }
   jenkins::plugin { 'git-client':
     version => '2.1.0'
@@ -19,16 +19,16 @@ class profile::jenkins () {
     version => '1.18'
   }
   jenkins::plugin { 'display-url-api':
-    version => '0.2'
+    version => '0.5'
   }
   jenkins::plugin { 'matrix-project':
     version => '1.7.1'
   }
   jenkins::plugin { 'junit':
-    version => '1.3'
+    version => '1.19'
   }
   jenkins::plugin { 'script-security':
-    version => '1.13'
+    version => '1.24'
   }
   jenkins::plugin { 'scm-api':
     version => '1.3'
